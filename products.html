@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products - WoolTech</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/css/splide.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --warm-white: #FEFEFE;
+            --oat: #F5F2ED;
+            --mist-grey: #E8E6E1;
+            --charcoal: #2C2C2C;
+            --sage: #A8A59B;
+            --cream: #FAF8F5;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--warm-white) 0%, var(--oat) 100%);
+            color: var(--charcoal);
+        }
+        
+        .filter-sidebar {
+            background: rgba(250, 248, 245, 0.9);
+            backdrop-filter: blur(10px);
+            border-right: 1px solid rgba(168, 165, 155, 0.1);
+        }
+        
+        .product-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(250, 248, 245, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(168, 165, 155, 0.1);
+        }
+        
+        .product-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(44, 44, 44, 0.1);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--sage) 0%, var(--mist-grey) 100%);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(168, 165, 155, 0.3);
+        }
+        
+        .filter-checkbox {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--sage);
+            border-radius: 4px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .filter-checkbox:checked {
+            background: var(--sage);
+        }
+        
+        .filter-checkbox:checked::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .price-range {
+            -webkit-appearance: none;
+            appearance: none;
+            height: 6px;
+            background: var(--mist-grey);
+            border-radius: 3px;
+            outline: none;
+        }
+        
+        .price-range::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: var(--sage);
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        
+        .price-range::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background: var(--sage);
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+        }
+        
+        .cart-badge {
+            background: var(--sage);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            top: -8px;
+            right: -8px;
+        }
+        
+        .nav-link {
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link:hover {
+            color: var(--sage);
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 50%;
+            background: var(--sage);
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+        
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        
+        .sort-select {
+            background: rgba(250, 248, 245, 0.9);
+            border: 1px solid rgba(168, 165, 155, 0.2);
+            border-radius: 8px;
+            padding: 8px 12px;
+            transition: all 0.3s ease;
+        }
+        
+        .sort-select:focus {
+            outline: none;
+            border-color: var(--sage);
+            box-shadow: 0 0 0 3px rgba(168, 165, 155, 0.1);
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal-content {
+            background: var(--warm-white);
+            margin: 5% auto;
+            padding: 0;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: modalSlideIn 0.3s ease;
+        }
+        
+        @keyframes modalSlideIn {
+            from { opacity: 0; transform: translateY(-50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            padding: 10px;
+            transition: color 0.3s ease;
+        }
+        
+        .close:hover {
+            color: var(--sage);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-md border-b border-gray-200/50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <h1 class="text-2xl font-bold text-gray-900">WoolTech</h1>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-8">
+                        <a href="kimi.html" class="nav-link text-gray-600 hover:text-gray-900">Home</a>
+                        <a href="products.html" class="nav-link text-gray-900 font-medium">Products</a>
+                        <a href="#about" class="nav-link text-gray-600 hover:text-gray-900">About</a>
+                        <a href="#contact" class="nav-link text-gray-600 hover:text-gray-900">Contact</a>
+                    </div>
+                </div>
+                <div class="flex items-center">
+                    <a href="cart.html" class="relative p-2 text-gray-600 hover:text-gray-900 transition-colors">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 6M7 13l-1.5 6m0 0h9m-9 0V19a2 2 0 002 2h7a2 2 0 002-2v-4"></path>
+                        </svg>
+                        <span class="cart-badge" id="cartCount">0</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <section class="pt-24 pb-8 bg-white/50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-4xl font-bold text-gray-900 mb-2">Our Collection</h1>
+                    <nav class="text-sm text-gray-500">
+                        <a href="kimi.html" class="hover:text-gray-700">Home</a>
+                        <span class="mx-2">/</span>
+                        <span class="text-gray-900">Products</span>
+                    </nav>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span class="text-sm text-gray-600" id="resultCount">Showing 12 products</span>
+                    <select class="sort-select" id="sortSelect">
+                        <option value="featured">Featured</option>
+                        <option value="price-low">Price: Low to High</option>
+                        <option value="price-high">Price: High to Low</option>
+                        <option value="newest">Newest</option>
+                        <option value="rating">Highest Rated</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
+        <div class="flex flex-col lg:flex-row gap-8">
+            <!-- Filter Sidebar -->
+            <div class="lg:w-1/4">
+                <div class="filter-sidebar p-6 rounded-2xl sticky top-24">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-lg font-semibold text-gray-900">Filters</h3>
+                        <button id="clearFilters" class="text-sm text-gray-500 hover:text-gray-700">Clear All</button>
+                    </div>
+                    
+                    <!-- Size Filter -->
+                    <div class="mb-8">
+                        <h4 class="font-medium text-gray-900 mb-4">Size</h4>
+                        <div class="grid grid-cols-3 gap-2">
+                            <label class="flex items-center justify-center">
+                                <input type="checkbox" class="filter-checkbox sr-only" data-filter="size" value="6">
+                                <span class="w-10 h-10 flex items-center justify-center border border-gray-300 rounded cursor-pointer hover:border-gray-400 transition-colors">6</span>
+                            </label>
+                            <label class="flex items-center justify-center">
+                                <input type="checkbox" class="filter-checkbox sr-only" data-filter="size" value="7">
+                                <span class="w-10 h-10 flex items-center justify-center border border-gray-300 rounded cursor-pointer hover:border-gray-400 transition-colors">7</span>
+                            </label>
+                            <label class="flex items-center justify-center">
+                                <input type="checkbox" class="filter-checkbox sr-only" data-filter="size" value="8">
+                                <span class="w-10 h-10 flex items-center justify-center border border-gray-300 rounded cursor-pointer hover:border-gray-400 transition-colors">8</span>
+                            </label>
+                            <label class="flex items-center justify-center">
+                                <input type="checkbox" class="filter-checkbox sr-only" data-filter="size" value="9">
+                                <span class="w-10 h-10 flex items-center justify-center border border-gray-300 rounded cursor-pointer hover:border-gray-400 transition-colors">9</span>
+                            </label>
+                            <label class="flex items-center justify-center">
+                                <input type="checkbox" class="filter-checkbox sr-only" data-filter="size" value="10">
+                                <span class="w-10 h-10 flex items-center justify-center border border-gray-300 rounded cursor-pointer hover:border-gray-400 transition-colors">10</span>
+                            </label>
+                            <label class="flex items-center justify-center">
+                                <input type="checkbox" class="filter-checkbox sr-only" data-filter="size" value="11">
+                                <span class="w-10 h-10 flex items-center justify-center border border-gray-300 rounded cursor-pointer hover:border-gray-400 transition-colors">11</span>
+                            </label>
+                            <label class="flex items-center justify-center">
+                                <input type="checkbox" class="filter-checkbox sr-only" data-filter="size" value="12">
+                                <span class="w-10 h-10 flex items-center justify-center border border-gray-300 rounded cursor-pointer hover:border-gray-400 transition-colors">12</span>
+                            </label>
+                            <label class="flex items-center justify-center">
+                                <input type="checkbox" class="filter-checkbox sr-only" data-filter="size" value="13">
+                                <span class="w-10 h-10 flex items-center justify-center border border-gray-300 rounded cursor-pointer hover:border-gray-400 transition-colors">13</span>
+                            </label>
+                            <label class="flex items-center justify-center">
+                                <input type="checkbox" class="filter-checkbox sr-only" data-filter="size" value="14">
+                                <span class="w-10 h-10 flex items-center justify-center border border-gray-300 rounded cursor-pointer hover:border-gray-400 transition-colors">14</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Color Filter -->
+                    <div class="mb-8">
+                        <h4 class="font-medium text-gray-900 mb-4">Color</h4>
+                        <div class="space-y-3">
+                            <label class="flex items-center">
+                                <input type="checkbox" class="filter-checkbox mr-3" data-filter="color" value="oat">
+                                <span class="w-6 h-6 bg-yellow-100 rounded-full mr-3 border border-gray-300"></span>
+                                <span class="text-gray-700">Oat</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="filter-checkbox mr-3" data-filter="color" value="mist-grey">
+                                <span class="w-6 h-6 bg-gray-300 rounded-full mr-3 border border-gray-300"></span>
+                                <span class="text-gray-700">Mist Grey</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="filter-checkbox mr-3" data-filter="color" value="charcoal">
+                                <span class="w-6 h-6 bg-gray-800 rounded-full mr-3 border border-gray-300"></span>
+                                <span class="text-gray-700">Charcoal</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="filter-checkbox mr-3" data-filter="color" value="forest">
+                                <span class="w-6 h-6 bg-green-800 rounded-full mr-3 border border-gray-300"></span>
+                                <span class="text-gray-700">Forest</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Price Range -->
+                    <div class="mb-8">
+                        <h4 class="font-medium text-gray-900 mb-4">Price Range</h4>
+                        <div class="space-y-4">
+                            <input type="range" class="price-range w-full" id="priceRange" min="120" max="280" value="280">
+                            <div class="flex justify-between text-sm text-gray-600">
+                                <span>$120</span>
+                                <span id="priceValue">$280</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Brand Filter -->
+                    <div class="mb-8">
+                        <h4 class="font-medium text-gray-900 mb-4">Brand</h4>
+                        <div class="space-y-3">
+                            <label class="flex items-center">
+                                <input type="checkbox" class="filter-checkbox mr-3" data-filter="brand" value="allbirds">
+                                <span class="text-gray-700">Allbirds</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="filter-checkbox mr-3" data-filter="brand" value="baabuk">
+                                <span class="text-gray-700">Baabuk</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="filter-checkbox mr-3" data-filter="brand" value="giesswein">
+                                <span class="text-gray-700">Giesswein</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Product Grid -->
+            <div class="lg:w-3/4">
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6" id="productGrid">
+                    <!-- Products will be dynamically loaded -->
+                </div>
+                
+                <div class="text-center mt-12">
+                    <button id="loadMore" class="btn-primary text-white px-8 py-4 rounded-full font-semibold">
+                        Load More Products
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Product Detail Modal -->
+    <div id="productModal" class="modal">
+        <div class="modal-content">
+            <div class="p-6 border-b border-gray-200">
+                <span class="close">&times;</span>
+                <h2 class="text-2xl font-bold text-gray-900" id="modalTitle">Product Details</h2>
+            </div>
+            <div class="p-6">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div>
+                        <img id="modalImage" src="" alt="" class="w-full h-auto rounded-lg">
+                    </div>
+                    <div>
+                        <div class="mb-4">
+                            <h3 class="text-xl font-semibold text-gray-900 mb-2" id="modalProductName"></h3>
+                            <p class="text-2xl font-bold text-gray-900 mb-4" id="modalPrice"></p>
+                            <p class="text-gray-600 mb-6" id="modalDescription"></p>
+                        </div>
+                        
+                        <div class="mb-6">
+                            <h4 class="font-medium text-gray-900 mb-3">Size</h4>
+                            <div class="grid grid-cols-4 gap-2" id="modalSizes">
+                                <!-- Size options will be populated -->
+                            </div>
+                        </div>
+                        
+                        <div class="mb-6">
+                            <h4 class="font-medium text-gray-900 mb-3">Color</h4>
+                            <div class="flex space-x-2" id="modalColors">
+                                <!-- Color options will be populated -->
+                            </div>
+                        </div>
+                        
+                        <div class="flex space-x-4">
+                            <button class="btn-primary text-white px-6 py-3 rounded-full font-semibold flex-1" id="addToCartModal">
+                                Add to Cart
+                            </button>
+                            <button class="border-2 border-gray-300 text-gray-700 px-6 py-3 rounded-full font-semibold hover:border-gray-400 transition-colors">
+                                Size Guide
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <h3 class="text-2xl font-bold mb-4">WoolTech</h3>
+                <p class="text-gray-400 mb-6">Natural wool meets urban tech</p>
+                <p class="text-gray-500 text-sm">
+                    © 2024 WoolTech. All rights reserved. Crafted with care for people and planet.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="main.js"></script>
+</body>
+</html>

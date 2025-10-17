@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WoolTech - Natural Wool Meets Urban Tech</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/css/splide.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --warm-white: #FEFEFE;
+            --oat: #F5F2ED;
+            --mist-grey: #E8E6E1;
+            --charcoal: #2C2C2C;
+            --sage: #A8A59B;
+            --cream: #FAF8F5;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--warm-white) 0%, var(--oat) 100%);
+            color: var(--charcoal);
+        }
+        
+        .hero-gradient {
+            background: linear-gradient(135deg, var(--warm-white) 0%, var(--mist-grey) 50%, var(--oat) 100%);
+            animation: gradientShift 8s ease-in-out infinite;
+        }
+        
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        
+        .wool-texture {
+            background-image: 
+                radial-gradient(circle at 20% 80%, rgba(168, 165, 155, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(245, 242, 237, 0.1) 0%, transparent 50%);
+        }
+        
+        .product-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(250, 248, 245, 0.8);
+            backdrop-filter: blur(10px);
+        }
+        
+        .product-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(44, 44, 44, 0.1);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--sage) 0%, var(--mist-grey) 100%);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(168, 165, 155, 0.3);
+        }
+        
+        .floating-animation {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .cart-badge {
+            background: var(--sage);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            top: -8px;
+            right: -8px;
+        }
+        
+        .benefit-icon {
+            width: 60px;
+            height: 60px;
+            background: rgba(168, 165, 155, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .benefit-icon:hover {
+            background: rgba(168, 165, 155, 0.2);
+            transform: scale(1.1);
+        }
+        
+        .testimonial-card {
+            background: rgba(250, 248, 245, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(168, 165, 155, 0.1);
+        }
+        
+        .nav-link {
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link:hover {
+            color: var(--sage);
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 50%;
+            background: var(--sage);
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+        
+        .nav-link:hover::after {
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-md border-b border-gray-200/50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <h1 class="text-2xl font-bold text-gray-900">WoolTech</h1>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-8">
+                        <a href="index.html" class="nav-link text-gray-900 font-medium">Home</a>
+                        <a href="products.html" class="nav-link text-gray-600 hover:text-gray-900">Products</a>
+                        <a href="#about" class="nav-link text-gray-600 hover:text-gray-900">About</a>
+                        <a href="#contact" class="nav-link text-gray-600 hover:text-gray-900">Contact</a>
+                    </div>
+                </div>
+                <div class="flex items-center">
+                    <a href="cart.html" class="relative p-2 text-gray-600 hover:text-gray-900 transition-colors">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 6M7 13l-1.5 6m0 0h9m-9 0V19a2 2 0 002 2h7a2 2 0 002-2v-4"></path>
+                        </svg>
+                        <span class="cart-badge" id="cartCount">0</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-gradient wool-texture min-h-screen flex items-center justify-center pt-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div class="text-center lg:text-left">
+                    <h1 class="text-5xl lg:text-7xl font-bold text-gray-900 mb-6 leading-tight">
+                        Natural Wool<br>
+                        <span class="text-gray-600">Meets Urban Tech</span>
+                    </h1>
+                    <p class="text-xl text-gray-600 mb-8 leading-relaxed">
+                        Experience the perfect fusion of sustainable merino wool and cutting-edge design. 
+                        Our premium sneakers deliver unmatched comfort, breathability, and style for the modern urban lifestyle.
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                        <a href="products.html" class="btn-primary text-white px-8 py-4 rounded-full font-semibold text-lg inline-flex items-center justify-center">
+                            Shop Collection
+                            <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                            </svg>
+                        </a>
+                        <a href="#story" class="border-2 border-gray-300 text-gray-700 px-8 py-4 rounded-full font-semibold text-lg hover:border-gray-400 transition-colors">
+                            Our Story
+                        </a>
+                    </div>
+                </div>
+                <div class="relative">
+                    <div class="floating-animation">
+                        <img src="resources/hero-sneakers.jpg" alt="Premium Wool Sneakers" class="w-full h-auto rounded-2xl shadow-2xl">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Brand Story Section -->
+    <section id="story" class="py-20 bg-white/50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div class="order-2 lg:order-1">
+                    <img src="resources/brand-story.jpg" alt="Brand Story" class="w-full h-auto rounded-2xl shadow-lg">
+                </div>
+                <div class="order-1 lg:order-2">
+                    <h2 class="text-4xl font-bold text-gray-900 mb-6">Crafted by Nature,<br>Designed for Life</h2>
+                    <p class="text-lg text-gray-600 mb-6 leading-relaxed">
+                        Our journey began with a simple question: What if the most advanced footwear technology 
+                        was already perfected by nature? Merino wool, with its incredible temperature-regulating 
+                        properties and sustainable footprint, became our foundation.
+                    </p>
+                    <p class="text-lg text-gray-600 mb-8 leading-relaxed">
+                        Every pair represents a commitment to environmental responsibility without compromising 
+                        on style or performance. From the mountaintops of New Zealand to the streets of your city, 
+                        we bring you footwear that adapts to your lifestyle while respecting our planet.
+                    </p>
+                    <div class="grid grid-cols-2 gap-6 mb-8">
+                        <div class="text-center">
+                            <div class="text-3xl font-bold text-gray-900 mb-2">100%</div>
+                            <div class="text-gray-600">Merino Wool</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-3xl font-bold text-gray-900 mb-2">0%</div>
+                            <div class="text-gray-600">Synthetic Materials</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-3xl font-bold text-gray-900 mb-2">-95%</div>
+                            <div class="text-gray-600">Water Usage</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-3xl font-bold text-gray-900 mb-2">100%</div>
+                            <div class="text-gray-600">Biodegradable</div>
+                        </div>
+                    </div>
+                    <a href="products.html" class="btn-primary text-white px-8 py-4 rounded-full font-semibold inline-flex items-center">
+                        Explore Collection
+                        <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Products -->
+    <section class="py-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">Featured Collection</h2>
+                <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+                    Discover our most popular wool sneakers, crafted for comfort, style, and sustainability.
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="featuredProducts">
+                <!-- Products will be dynamically loaded -->
+            </div>
+            
+            <div class="text-center mt-12">
+                <a href="products.html" class="btn-primary text-white px-8 py-4 rounded-full font-semibold text-lg">
+                    View All Products
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Benefits Showcase -->
+    <section class="py-20 bg-white/50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">Why Choose Wool?</h2>
+                <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+                    Discover the natural advantages of merino wool footwear.
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div class="text-center">
+                    <div class="benefit-icon">
+                        <svg class="w-8 h-8 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-3">Temperature Regulation</h3>
+                    <p class="text-gray-600">Keeps your feet warm in winter and cool in summer, adapting to your body temperature naturally.</p>
+                </div>
+                
+                <div class="text-center">
+                    <div class="benefit-icon">
+                        <svg class="w-8 h-8 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4h4a2 2 0 002-2V5z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-3">Moisture Wicking</h3>
+                    <p class="text-gray-600">Absorbs up to 30% of its weight in moisture without feeling wet, keeping your feet dry and comfortable.</p>
+                </div>
+                
+                <div class="text-center">
+                    <div class="benefit-icon">
+                        <svg class="w-8 h-8 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-3">Odor Resistant</h3>
+                    <p class="text-gray-600">Natural antibacterial properties prevent odor-causing bacteria, keeping your shoes fresh longer.</p>
+                </div>
+                
+                <div class="text-center">
+                    <div class="benefit-icon">
+                        <svg class="w-8 h-8 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-3">Sustainable</h3>
+                    <p class="text-gray-600">100% natural, renewable, and biodegradable materials that are gentle on the planet.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Customer Testimonials -->
+    <section class="py-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">What Our Customers Say</h2>
+                <p class="text-xl text-gray-600">Real experiences from real people</p>
+            </div>
+            
+            <div class="splide" id="testimonialSlider">
+                <div class="splide__track">
+                    <ul class="splide__list">
+                        <li class="splide__slide">
+                            <div class="testimonial-card p-8 rounded-2xl mx-4">
+                                <div class="flex items-center mb-4">
+                                    <div class="w-12 h-12 bg-gray-300 rounded-full mr-4"></div>
+                                    <div>
+                                        <h4 class="font-semibold text-gray-900">Sarah Chen</h4>
+                                        <div class="flex text-yellow-400">
+                                            <span>★★★★★</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <p class="text-gray-600 italic">
+                                    "These are hands down the most comfortable shoes I've ever owned. The temperature regulation is incredible - my feet stay comfortable whether I'm walking to work or out for dinner."
+                                </p>
+                            </div>
+                        </li>
+                        <li class="splide__slide">
+                            <div class="testimonial-card p-8 rounded-2xl mx-4">
+                                <div class="flex items-center mb-4">
+                                    <div class="w-12 h-12 bg-gray-300 rounded-full mr-4"></div>
+                                    <div>
+                                        <h4 class="font-semibold text-gray-900">Marcus Johnson</h4>
+                                        <div class="flex text-yellow-400">
+                                            <span>★★★★★</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <p class="text-gray-600 italic">
+                                    "I was skeptical about wool shoes, but these exceeded all expectations. No odor even after wearing them all day, and they look incredibly stylish with everything."
+                                </p>
+                            </div>
+                        </li>
+                        <li class="splide__slide">
+                            <div class="testimonial-card p-8 rounded-2xl mx-4">
+                                <div class="flex items-center mb-4">
+                                    <div class="w-12 h-12 bg-gray-300 rounded-full mr-4"></div>
+                                    <div>
+                                        <h4 class="font-semibold text-gray-900">Emma Rodriguez</h4>
+                                        <div class="flex text-yellow-400">
+                                            <span>★★★★★</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <p class="text-gray-600 italic">
+                                    "Love the sustainability aspect! It's amazing to have shoes that are both environmentally conscious and incredibly comfortable. Worth every penny."
+                                </p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <h3 class="text-2xl font-bold mb-4">WoolTech</h3>
+                <p class="text-gray-400 mb-6">Natural wool meets urban tech</p>
+                <p class="text-gray-500 text-sm">
+                    © 2024 WoolTech. All rights reserved. Crafted with care for people and planet.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="main.js"></script>
+</body>
+</html>
